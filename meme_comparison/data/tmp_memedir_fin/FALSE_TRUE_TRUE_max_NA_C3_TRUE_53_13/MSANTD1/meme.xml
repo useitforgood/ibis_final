@@ -1,0 +1,2020 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<!-- Document definition -->
+<!DOCTYPE MEME[
+<!ELEMENT MEME (
+  training_set,
+  model, 
+  motifs, 
+  scanned_sites_summary?
+)>
+<!ATTLIST MEME 
+  version CDATA #REQUIRED
+  release CDATA #REQUIRED
+>
+<!-- Training-set elements -->
+<!ELEMENT training_set (alphabet, ambigs, sequence*, letter_frequencies)>
+<!ATTLIST training_set primary_sequences CDATA #REQUIRED primary_count CDATA #REQUIRED primary_positions CDATA #REQUIRED
+  control_sequences CDATA "" control_count CDATA "" control_positions CDATA "">
+<!ELEMENT alphabet (letter*)>
+<!ATTLIST alphabet name CDATA #REQUIRED>
+<!ELEMENT ambigs (letter*)>
+<!ELEMENT letter EMPTY>
+<!ATTLIST letter id ID #REQUIRED>
+<!ATTLIST letter symbol CDATA #REQUIRED>
+<!ATTLIST letter equals CDATA #IMPLIED>
+<!ATTLIST letter aliases CDATA #IMPLIED>
+<!ATTLIST letter complement CDATA #IMPLIED>
+<!ATTLIST letter name CDATA #IMPLIED>
+<!ATTLIST letter colour CDATA #IMPLIED>
+<!ELEMENT sequence EMPTY>
+<!ATTLIST sequence id ID #REQUIRED
+                   name CDATA #REQUIRED
+                   length CDATA #REQUIRED
+                   weight CDATA #REQUIRED
+>
+<!ELEMENT letter_frequencies (alphabet_array)>
+
+<!-- Model elements -->
+<!ELEMENT model (
+  command_line,
+  host,
+  type,
+  nmotifs,
+  evalue_threshold,
+  object_function,
+  spfun,
+  min_width,
+  max_width,
+  wg,
+  ws,
+  endgaps,
+  minsites,
+  maxsites,
+  wnsites,
+  spmap,
+  spfuzz,
+  prior,
+  beta,
+  maxiter,
+  distance,
+  num_positions,
+  seed,
+  hsfrac,
+  searchsize,
+  maxsize,
+  norand,
+  csites,
+  strands,
+  brief,
+  psp_file,
+  priors_file,
+  reason_for_stopping,
+  background_frequencies
+)>
+<!ELEMENT command_line (#PCDATA)*>
+<!ELEMENT host (#PCDATA)*>
+<!ELEMENT type (#PCDATA)*>
+<!ELEMENT nmotifs (#PCDATA)*>
+<!ELEMENT evalue_threshold (#PCDATA)*>
+<!ELEMENT object_function (#PCDATA)*>
+<!ELEMENT spfun (#PCDATA)*>
+<!ELEMENT min_width (#PCDATA)*>
+<!ELEMENT max_width (#PCDATA)*>
+<!ELEMENT wg (#PCDATA)*>
+<!ELEMENT ws (#PCDATA)*>
+<!ELEMENT endgaps (#PCDATA)*>
+<!ELEMENT minsites (#PCDATA)*>
+<!ELEMENT maxsites (#PCDATA)*>
+<!ELEMENT wnsites (#PCDATA)*>
+<!ELEMENT spmap (#PCDATA)*>
+<!ELEMENT spfuzz (#PCDATA)*>
+<!ELEMENT prior (#PCDATA)*>
+<!ELEMENT beta (#PCDATA)*>
+<!ELEMENT maxiter (#PCDATA)*>
+<!ELEMENT distance (#PCDATA)*>
+<!ELEMENT num_positions (#PCDATA)*>
+<!ELEMENT seed (#PCDATA)*>
+<!ELEMENT hsfrac (#PCDATA)*>
+<!ELEMENT searchsize (#PCDATA)*>
+<!ELEMENT maxsize (#PCDATA)*>
+<!ELEMENT norand (#PCDATA)*>
+<!ELEMENT csites (#PCDATA)*>
+<!ELEMENT strands (#PCDATA)*>
+<!ELEMENT brief (#PCDATA)*>
+<!ELEMENT psp_file (#PCDATA)*>
+<!ELEMENT priors_file (#PCDATA)*>
+<!ELEMENT reason_for_stopping (#PCDATA)*>
+<!ELEMENT background_frequencies (alphabet_array)>
+<!ATTLIST background_frequencies source CDATA #REQUIRED
+		   order CDATA #REQUIRED>
+
+<!-- Motif elements -->
+<!ELEMENT motifs (motif*)>
+<!ELEMENT motif (scores, probabilities, regular_expression?, contributing_sites)>
+<!ATTLIST motif id ID #REQUIRED
+                name CDATA #REQUIRED
+                alt CDATA ""
+                width CDATA #REQUIRED
+                sites CDATA #REQUIRED
+                ic CDATA #REQUIRED
+                re CDATA #REQUIRED
+                llr CDATA #REQUIRED
+                p_value CDATA #REQUIRED
+                e_value CDATA #REQUIRED
+                bayes_threshold CDATA #REQUIRED
+                elapsed_time CDATA #REQUIRED
+                url CDATA ""
+>
+<!ELEMENT scores (alphabet_matrix)>
+<!ELEMENT probabilities (alphabet_matrix)>
+<!ELEMENT regular_expression (#PCDATA)*>
+
+<!-- Contributing site elements -->
+<!-- Contributing sites are motif occurences found during the motif discovery phase -->
+<!ELEMENT contributing_sites (contributing_site*)>
+<!ELEMENT contributing_site (left_flank, site, right_flank)>
+<!ATTLIST contributing_site sequence_id IDREF #REQUIRED
+                          position CDATA #REQUIRED
+                          strand (plus|minus|none) 'none'
+                          pvalue CDATA #REQUIRED
+>
+<!-- The left_flank contains the sequence for 10 bases to the left of the motif start -->
+<!ELEMENT left_flank (#PCDATA)>
+<!-- The site contains the sequence for the motif instance -->
+<!ELEMENT site (letter_ref*)>
+<!-- The right_flank contains the sequence for 10 bases to the right of the motif end -->
+<!ELEMENT right_flank (#PCDATA)>
+
+<!-- Scanned site elements -->
+<!-- Scanned sites are motif occurences found during the sequence scan phase -->
+<!ELEMENT scanned_sites_summary (scanned_sites*)>
+<!ATTLIST scanned_sites_summary p_thresh CDATA #REQUIRED>
+<!ELEMENT scanned_sites (scanned_site*)>
+<!ATTLIST scanned_sites sequence_id IDREF #REQUIRED
+                        pvalue CDATA #REQUIRED
+                        num_sites CDATA #REQUIRED>
+<!ELEMENT scanned_site EMPTY>
+<!ATTLIST scanned_site  motif_id IDREF #REQUIRED
+                        strand (plus|minus|none) 'none'
+                        position CDATA #REQUIRED
+                        pvalue CDATA #REQUIRED>
+
+<!-- Utility elements -->
+<!-- A reference to a letter in the alphabet -->
+<!ELEMENT letter_ref EMPTY>
+<!ATTLIST letter_ref letter_id IDREF #REQUIRED>
+<!-- A alphabet-array contains one floating point value for each letter in an alphabet -->
+<!ELEMENT alphabet_array (value*)>
+<!ELEMENT value (#PCDATA)>
+<!ATTLIST value letter_id IDREF #REQUIRED>
+
+<!-- A alphabet_matrix contains one alphabet_array for each position in a motif -->
+<!ELEMENT alphabet_matrix (alphabet_array*)>
+
+]>
+<!-- Begin document body -->
+<MEME version="5.5.5" release="Thu Sep 14 08:48:04 2023 +1000">
+<training_set primary_sequences="data/tmp_memedir/FALSE_TRUE_TRUE_max_NA_C3_TRUE_53_13/MSANTD1.fasta" primary_count="521594" primary_positions="20863760" control_sequences="--none--" control_count="0" control_positions="0">
+<alphabet name="DNA" like="dna">
+<letter id="A" symbol="A" complement="T" name="Adenine" colour="CC0000"/>
+<letter id="C" symbol="C" complement="G" name="Cytosine" colour="0000CC"/>
+<letter id="G" symbol="G" complement="C" name="Guanine" colour="FFB300"/>
+<letter id="T" symbol="T" aliases="U" complement="A" name="Thymine" colour="008000"/>
+<letter id="N" symbol="N" aliases="X." equals="ACGT" name="Any base"/>
+<letter id="V" symbol="V" equals="ACG" name="Not T"/>
+<letter id="H" symbol="H" equals="ACT" name="Not G"/>
+<letter id="D" symbol="D" equals="AGT" name="Not C"/>
+<letter id="B" symbol="B" equals="CGT" name="Not A"/>
+<letter id="M" symbol="M" equals="AC" name="Amino"/>
+<letter id="R" symbol="R" equals="AG" name="Purine"/>
+<letter id="W" symbol="W" equals="AT" name="Weak"/>
+<letter id="S" symbol="S" equals="CG" name="Strong"/>
+<letter id="Y" symbol="Y" equals="CT" name="Pyrimidine"/>
+<letter id="K" symbol="K" equals="GT" name="Keto"/>
+</alphabet>
+<letter_frequencies>
+<alphabet_array>
+<value letter_id="A">0.254</value>
+<value letter_id="C">0.246</value>
+<value letter_id="G">0.246</value>
+<value letter_id="T">0.254</value>
+</alphabet_array>
+</letter_frequencies>
+</training_set>
+<model>
+<command_line>meme data/tmp_memedir/FALSE_TRUE_TRUE_max_NA_C3_TRUE_53_13/MSANTD1.fasta -oc data/tmp_memedir/FALSE_TRUE_TRUE_max_NA_C3_TRUE_53_13/MSANTD1 -nmotifs 6 -dna -maxw 30 -p 1 -seed 53 -revcomp </command_line>
+<host>fedora</host>
+<type>zoops</type>
+<nmotifs>6</nmotifs>
+<evalue_threshold>inf</evalue_threshold>
+<object_function>E-value of product of p-values</object_function>
+<spfun>E-value of product of p-values</spfun>
+<min_width>8</min_width>
+<max_width>30</max_width>
+<wg>11</wg>
+<ws>1</ws>
+<endgaps>yes</endgaps>
+<substring>yes</substring>
+<minsites>2</minsites>
+<maxsites>521594</maxsites>
+<wnsites>0.8</wnsites>
+<spmap>uni</spmap>
+<spfuzz>0.5</spfuzz>
+<prior>dirichlet</prior>
+<beta>0.01</beta>
+<maxiter>50</maxiter>
+<distance>1e-05</distance>
+<num_positions>20863760</num_positions>
+<seed>53</seed>
+<hsfrac>0</hsfrac>
+<searchsize>100000</searchsize>
+<maxsize>0</maxsize>
+<norand>no</norand>
+<csites>1000</csites>
+<strands>both</strands>
+<brief>1000</brief>
+<psp_file></psp_file>
+<priors_file></priors_file>
+<reason_for_stopping>Stopped because requested number of motifs (6) found.</reason_for_stopping>
+<background_frequencies source="--sequences--" order="0">
+<alphabet_array>
+<value letter_id="A">0.254</value>
+<value letter_id="C">0.246</value>
+<value letter_id="G">0.246</value>
+<value letter_id="T">0.254</value>
+</alphabet_array>
+</background_frequencies>
+</model>
+<motifs>
+<motif id="motif_1" name="TTAAGTGSBNW" alt="MEME-1" width="11" sites="183947" ic="12.5" re="12.5" llr="1588606" p_value="2.6e-1319" e_value="3.9e-407" bayes_threshold="8.72103" elapsed_time="326.895022">
+<scores>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">-2413</value>
+<value letter_id="C">-2413</value>
+<value letter_id="G">-2413</value>
+<value letter_id="T">198</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-2413</value>
+<value letter_id="C">-814</value>
+<value letter_id="G">-2413</value>
+<value letter_id="T">198</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">198</value>
+<value letter_id="C">-2413</value>
+<value letter_id="G">-2413</value>
+<value letter_id="T">-2413</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">198</value>
+<value letter_id="C">-2413</value>
+<value letter_id="G">-2413</value>
+<value letter_id="T">-2413</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-2413</value>
+<value letter_id="C">-2413</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-2413</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-182</value>
+<value letter_id="C">-321</value>
+<value letter_id="G">-2413</value>
+<value letter_id="T">183</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-116</value>
+<value letter_id="C">-65</value>
+<value letter_id="G">135</value>
+<value letter_id="T">-129</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-118</value>
+<value letter_id="C">90</value>
+<value letter_id="G">4</value>
+<value letter_id="T">-53</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-84</value>
+<value letter_id="C">64</value>
+<value letter_id="G">-29</value>
+<value letter_id="T">11</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">11</value>
+<value letter_id="C">10</value>
+<value letter_id="G">-57</value>
+<value letter_id="T">22</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">30</value>
+<value letter_id="C">-63</value>
+<value letter_id="G">-225</value>
+<value letter_id="T">91</value>
+</alphabet_array>
+</alphabet_matrix>
+</scores>
+<probabilities>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">1.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000870</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.999130</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">1.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">1.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.071961</value>
+<value letter_id="C">0.026540</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.901499</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.113663</value>
+<value letter_id="C">0.156686</value>
+<value letter_id="G">0.625463</value>
+<value letter_id="T">0.104188</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.111962</value>
+<value letter_id="C">0.458480</value>
+<value letter_id="G">0.253383</value>
+<value letter_id="T">0.176176</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.141726</value>
+<value letter_id="C">0.382833</value>
+<value letter_id="G">0.201629</value>
+<value letter_id="T">0.273813</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.273818</value>
+<value letter_id="C">0.264359</value>
+<value letter_id="G">0.166064</value>
+<value letter_id="T">0.295759</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.313329</value>
+<value letter_id="C">0.158665</value>
+<value letter_id="G">0.051683</value>
+<value letter_id="T">0.476322</value>
+</alphabet_array>
+</alphabet_matrix>
+</probabilities>
+<regular_expression>
+TTAAGTG[CG][CTG][TAC][TA]
+</regular_expression>
+<contributing_sites>
+</contributing_sites>
+</motif>
+<motif id="motif_2" name="KGGGKDDGDGDKRKKDRGRGKGRKGRDGGG" alt="MEME-2" width="30" sites="52692" ic="10.0" re="10.1" llr="369324" p_value="4.0e-403" e_value="1.3e-038" bayes_threshold="9.08247" elapsed_time="573.261993">
+<scores>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">-153</value>
+<value letter_id="C">-113</value>
+<value letter_id="G">80</value>
+<value letter_id="T">54</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-114</value>
+<value letter_id="C">-155</value>
+<value letter_id="G">113</value>
+<value letter_id="T">5</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-21</value>
+<value letter_id="C">-2233</value>
+<value letter_id="G">125</value>
+<value letter_id="T">-37</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-39</value>
+<value letter_id="C">-98</value>
+<value letter_id="G">133</value>
+<value letter_id="T">-202</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-38</value>
+<value letter_id="C">-49</value>
+<value letter_id="G">71</value>
+<value letter_id="T">-17</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-19</value>
+<value letter_id="C">-67</value>
+<value letter_id="G">43</value>
+<value letter_id="T">20</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-8</value>
+<value letter_id="C">-62</value>
+<value letter_id="G">46</value>
+<value letter_id="T">3</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-58</value>
+<value letter_id="C">-2233</value>
+<value letter_id="G">137</value>
+<value letter_id="T">-37</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">22</value>
+<value letter_id="C">-122</value>
+<value letter_id="G">55</value>
+<value letter_id="T">-9</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-2</value>
+<value letter_id="C">-153</value>
+<value letter_id="G">131</value>
+<value letter_id="T">-219</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">4</value>
+<value letter_id="C">-110</value>
+<value letter_id="G">26</value>
+<value letter_id="T">38</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-47</value>
+<value letter_id="C">-2233</value>
+<value letter_id="G">114</value>
+<value letter_id="T">11</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-5</value>
+<value letter_id="C">-78</value>
+<value letter_id="G">94</value>
+<value letter_id="T">-89</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-189</value>
+<value letter_id="C">-89</value>
+<value letter_id="G">109</value>
+<value letter_id="T">11</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-42</value>
+<value letter_id="C">-350</value>
+<value letter_id="G">101</value>
+<value letter_id="T">22</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-23</value>
+<value letter_id="C">-103</value>
+<value letter_id="G">55</value>
+<value letter_id="T">26</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">34</value>
+<value letter_id="C">-177</value>
+<value letter_id="G">123</value>
+<value letter_id="T">-310</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-93</value>
+<value letter_id="C">-25</value>
+<value letter_id="G">119</value>
+<value letter_id="T">-134</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">33</value>
+<value letter_id="C">-104</value>
+<value letter_id="G">66</value>
+<value letter_id="T">-57</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-77</value>
+<value letter_id="C">-143</value>
+<value letter_id="G">110</value>
+<value letter_id="T">-12</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-36</value>
+<value letter_id="C">-176</value>
+<value letter_id="G">93</value>
+<value letter_id="T">3</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-42</value>
+<value letter_id="C">-58</value>
+<value letter_id="G">110</value>
+<value letter_id="T">-110</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">26</value>
+<value letter_id="C">-212</value>
+<value letter_id="G">83</value>
+<value letter_id="T">-32</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-67</value>
+<value letter_id="C">-400</value>
+<value letter_id="G">99</value>
+<value letter_id="T">40</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-86</value>
+<value letter_id="C">-42</value>
+<value letter_id="G">97</value>
+<value letter_id="T">-40</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">6</value>
+<value letter_id="C">-127</value>
+<value letter_id="G">96</value>
+<value letter_id="T">-73</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-22</value>
+<value letter_id="C">-134</value>
+<value letter_id="G">70</value>
+<value letter_id="T">17</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-135</value>
+<value letter_id="C">-157</value>
+<value letter_id="G">129</value>
+<value letter_id="T">-23</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-114</value>
+<value letter_id="C">-717</value>
+<value letter_id="G">169</value>
+<value letter_id="T">-152</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-97</value>
+<value letter_id="C">-176</value>
+<value letter_id="G">117</value>
+<value letter_id="T">-6</value>
+</alphabet_array>
+</alphabet_matrix>
+</scores>
+<probabilities>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">0.088173</value>
+<value letter_id="C">0.112674</value>
+<value letter_id="G">0.429154</value>
+<value letter_id="T">0.369999</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.115217</value>
+<value letter_id="C">0.083808</value>
+<value letter_id="G">0.537216</value>
+<value letter_id="T">0.263759</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.219464</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.583770</value>
+<value letter_id="T">0.196766</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.193483</value>
+<value letter_id="C">0.125085</value>
+<value letter_id="G">0.618671</value>
+<value letter_id="T">0.062761</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.194963</value>
+<value letter_id="C">0.175624</value>
+<value letter_id="G">0.403458</value>
+<value letter_id="T">0.225955</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.221931</value>
+<value letter_id="C">0.154900</value>
+<value letter_id="G">0.332214</value>
+<value letter_id="T">0.290955</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.240890</value>
+<value letter_id="C">0.160613</value>
+<value letter_id="G">0.338325</value>
+<value letter_id="T">0.260172</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.170102</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.633720</value>
+<value letter_id="T">0.196178</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.295700</value>
+<value letter_id="C">0.105500</value>
+<value letter_id="G">0.360700</value>
+<value letter_id="T">0.238101</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.250418</value>
+<value letter_id="C">0.084909</value>
+<value letter_id="G">0.608897</value>
+<value letter_id="T">0.055777</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.260628</value>
+<value letter_id="C">0.114761</value>
+<value letter_id="G">0.295206</value>
+<value letter_id="T">0.329405</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.183804</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.542378</value>
+<value letter_id="T">0.273818</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.245768</value>
+<value letter_id="C">0.143703</value>
+<value letter_id="G">0.473260</value>
+<value letter_id="T">0.137269</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.068454</value>
+<value letter_id="C">0.133132</value>
+<value letter_id="G">0.524539</value>
+<value letter_id="T">0.273875</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.189346</value>
+<value letter_id="C">0.021787</value>
+<value letter_id="G">0.493813</value>
+<value letter_id="T">0.295054</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.216750</value>
+<value letter_id="C">0.120739</value>
+<value letter_id="G">0.359371</value>
+<value letter_id="T">0.303139</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.321130</value>
+<value letter_id="C">0.071908</value>
+<value letter_id="G">0.577317</value>
+<value letter_id="T">0.029644</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.132904</value>
+<value letter_id="C">0.206160</value>
+<value letter_id="G">0.560275</value>
+<value letter_id="T">0.100660</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.319973</value>
+<value letter_id="C">0.119316</value>
+<value letter_id="G">0.389433</value>
+<value letter_id="T">0.171278</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.149074</value>
+<value letter_id="C">0.091342</value>
+<value letter_id="G">0.525697</value>
+<value letter_id="T">0.233887</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.197696</value>
+<value letter_id="C">0.072383</value>
+<value letter_id="G">0.470261</value>
+<value letter_id="T">0.259660</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.190332</value>
+<value letter_id="C">0.164807</value>
+<value letter_id="G">0.526664</value>
+<value letter_id="T">0.118196</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.303348</value>
+<value letter_id="C">0.056460</value>
+<value letter_id="G">0.436822</value>
+<value letter_id="T">0.203371</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.159303</value>
+<value letter_id="C">0.015391</value>
+<value letter_id="G">0.489752</value>
+<value letter_id="T">0.335554</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.140021</value>
+<value letter_id="C">0.184259</value>
+<value letter_id="G">0.482768</value>
+<value letter_id="T">0.192951</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.265467</value>
+<value letter_id="C">0.102179</value>
+<value letter_id="G">0.479124</value>
+<value letter_id="T">0.153230</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.217699</value>
+<value letter_id="C">0.097415</value>
+<value letter_id="G">0.398827</value>
+<value letter_id="T">0.286059</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.099522</value>
+<value letter_id="C">0.082859</value>
+<value letter_id="G">0.601344</value>
+<value letter_id="T">0.216276</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.115103</value>
+<value letter_id="C">0.001708</value>
+<value letter_id="G">0.794390</value>
+<value letter_id="T">0.088799</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.129602</value>
+<value letter_id="C">0.072611</value>
+<value letter_id="G">0.554676</value>
+<value letter_id="T">0.243111</value>
+</alphabet_array>
+</alphabet_matrix>
+</probabilities>
+<regular_expression>
+[GT][GT][GA]G[GT][GTA][GTA]G[GAT][GA][TGA][GT][GA][GT][GT][GTA][GA][GC][GA][GT][GT]G[GAT][GT]G[GA][GTA][GT]G[GT]
+</regular_expression>
+<contributing_sites>
+</contributing_sites>
+</motif>
+<motif id="motif_3" name="GGKGGYGTGGWSWGG" alt="MEME-3" width="15" sites="217" ic="17.4" re="17.5" llr="2634" p_value="7.8e-040" e_value="1.4e+005" bayes_threshold="18.0549" elapsed_time="808.160373">
+<scores>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">-1441</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">191</value>
+<value letter_id="T">-170</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-17</value>
+<value letter_id="C">-98</value>
+<value letter_id="G">140</value>
+<value letter_id="T">-1441</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-83</value>
+<value letter_id="C">-115</value>
+<value letter_id="G">88</value>
+<value letter_id="T">22</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-126</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">186</value>
+<value letter_id="T">-1441</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1441</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">190</value>
+<value letter_id="T">-161</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1441</value>
+<value letter_id="C">96</value>
+<value letter_id="G">-1441</value>
+<value letter_id="T">104</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-208</value>
+<value letter_id="C">-149</value>
+<value letter_id="G">156</value>
+<value letter_id="T">-98</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-3</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">-1441</value>
+<value letter_id="T">156</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1441</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">157</value>
+<value letter_id="T">7</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1441</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-1441</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">24</value>
+<value letter_id="C">-98</value>
+<value letter_id="G">-1441</value>
+<value letter_id="T">118</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1441</value>
+<value letter_id="C">138</value>
+<value letter_id="G">55</value>
+<value letter_id="T">-1441</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">117</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">-1441</value>
+<value letter_id="T">75</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-126</value>
+<value letter_id="C">-1441</value>
+<value letter_id="G">186</value>
+<value letter_id="T">-1441</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1441</value>
+<value letter_id="C">-83</value>
+<value letter_id="G">181</value>
+<value letter_id="T">-1441</value>
+</alphabet_array>
+</alphabet_matrix>
+</scores>
+<probabilities>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.921659</value>
+<value letter_id="T">0.078341</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.225806</value>
+<value letter_id="C">0.124424</value>
+<value letter_id="G">0.649770</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.142857</value>
+<value letter_id="C">0.110599</value>
+<value letter_id="G">0.451613</value>
+<value letter_id="T">0.294931</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.105991</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.894009</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.917051</value>
+<value letter_id="T">0.082949</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.479263</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.520737</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.059908</value>
+<value letter_id="C">0.087558</value>
+<value letter_id="G">0.723502</value>
+<value letter_id="T">0.129032</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.248848</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.751152</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.732719</value>
+<value letter_id="T">0.267281</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.299539</value>
+<value letter_id="C">0.124424</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.576037</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.640553</value>
+<value letter_id="G">0.359447</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.571429</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.428571</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.105991</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.894009</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.138249</value>
+<value letter_id="G">0.861751</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+</alphabet_matrix>
+</probabilities>
+<regular_expression>
+G[GA][GT]GG[TC]G[TA][GT]G[TA][CG][AT]GG
+</regular_expression>
+<contributing_sites>
+</contributing_sites>
+</motif>
+<motif id="motif_4" name="GBKKNGGGRTGTYRTCGTGTKASKKBKG" alt="MEME-4" width="28" sites="17" ic="23.2" re="23.3" llr="275" p_value="2.1e-025" e_value="1.1e+006" bayes_threshold="18.6751" elapsed_time="1042.620882">
+<scores>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-1073</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-111</value>
+<value letter_id="C">-6</value>
+<value letter_id="G">74</value>
+<value letter_id="T">-11</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">74</value>
+<value letter_id="T">121</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">139</value>
+<value letter_id="T">47</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-11</value>
+<value letter_id="C">-6</value>
+<value letter_id="G">-48</value>
+<value letter_id="T">47</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">-206</value>
+<value letter_id="G">152</value>
+<value letter_id="T">-211</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-11</value>
+<value letter_id="C">-6</value>
+<value letter_id="G">111</value>
+<value letter_id="T">-1073</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">-48</value>
+<value letter_id="G">126</value>
+<value letter_id="T">-211</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">47</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">139</value>
+<value letter_id="T">-1073</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">-106</value>
+<value letter_id="G">-206</value>
+<value letter_id="T">135</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-1073</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">-206</value>
+<value letter_id="G">-206</value>
+<value letter_id="T">147</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">94</value>
+<value letter_id="G">-106</value>
+<value letter_id="T">-11</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">47</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">126</value>
+<value letter_id="T">-211</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-211</value>
+<value letter_id="C">-106</value>
+<value letter_id="G">-106</value>
+<value letter_id="T">147</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">152</value>
+<value letter_id="G">26</value>
+<value letter_id="T">-1073</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">174</value>
+<value letter_id="T">-53</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">-48</value>
+<value letter_id="G">-106</value>
+<value letter_id="T">106</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">164</value>
+<value letter_id="T">-11</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-11</value>
+<value letter_id="C">-206</value>
+<value letter_id="G">-1073</value>
+<value letter_id="T">147</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-211</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">111</value>
+<value letter_id="T">70</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">147</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">-48</value>
+<value letter_id="T">-111</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">74</value>
+<value letter_id="G">126</value>
+<value letter_id="T">-1073</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-206</value>
+<value letter_id="G">111</value>
+<value letter_id="T">70</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">52</value>
+<value letter_id="T">135</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-1073</value>
+<value letter_id="C">26</value>
+<value letter_id="G">94</value>
+<value letter_id="T">-11</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">-106</value>
+<value letter_id="G">-6</value>
+<value letter_id="T">89</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-53</value>
+<value letter_id="C">-1073</value>
+<value letter_id="G">174</value>
+<value letter_id="T">-1073</value>
+</alphabet_array>
+</alphabet_matrix>
+</scores>
+<probabilities>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.117647</value>
+<value letter_id="C">0.235294</value>
+<value letter_id="G">0.411765</value>
+<value letter_id="T">0.235294</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.411765</value>
+<value letter_id="T">0.588235</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.647059</value>
+<value letter_id="T">0.352941</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.235294</value>
+<value letter_id="C">0.235294</value>
+<value letter_id="G">0.176471</value>
+<value letter_id="T">0.352941</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.058824</value>
+<value letter_id="G">0.705882</value>
+<value letter_id="T">0.058824</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.235294</value>
+<value letter_id="C">0.235294</value>
+<value letter_id="G">0.529412</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.176471</value>
+<value letter_id="G">0.588235</value>
+<value letter_id="T">0.058824</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.352941</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.647059</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.117647</value>
+<value letter_id="G">0.058824</value>
+<value letter_id="T">0.647059</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.058824</value>
+<value letter_id="G">0.058824</value>
+<value letter_id="T">0.705882</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.470588</value>
+<value letter_id="G">0.117647</value>
+<value letter_id="T">0.235294</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.352941</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.588235</value>
+<value letter_id="T">0.058824</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.058824</value>
+<value letter_id="C">0.117647</value>
+<value letter_id="G">0.117647</value>
+<value letter_id="T">0.705882</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.705882</value>
+<value letter_id="G">0.294118</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.823529</value>
+<value letter_id="T">0.176471</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.176471</value>
+<value letter_id="G">0.117647</value>
+<value letter_id="T">0.529412</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.764706</value>
+<value letter_id="T">0.235294</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.235294</value>
+<value letter_id="C">0.058824</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.705882</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.058824</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.529412</value>
+<value letter_id="T">0.411765</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.705882</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.176471</value>
+<value letter_id="T">0.117647</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.411765</value>
+<value letter_id="G">0.588235</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.058824</value>
+<value letter_id="G">0.529412</value>
+<value letter_id="T">0.411765</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.352941</value>
+<value letter_id="T">0.647059</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.294118</value>
+<value letter_id="G">0.470588</value>
+<value letter_id="T">0.235294</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.117647</value>
+<value letter_id="G">0.235294</value>
+<value letter_id="T">0.470588</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.176471</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.823529</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+</alphabet_matrix>
+</probabilities>
+<regular_expression>
+G[GCT][TG][GT][TAC]G[GAC]G[GA]TGT[CT][GA]T[CG]GT[GT][TA][GT]A[GC][GT][TG][GCT][TG]G
+</regular_expression>
+<contributing_sites>
+</contributing_sites>
+</motif>
+<motif id="motif_5" name="GBWTGRTGATGCMACCGAMAGCGTGST" alt="MEME-5" width="27" sites="4" ic="41.8" re="41.9" llr="116" p_value="4.4e-011" e_value="1.1e+006" bayes_threshold="20.7999" elapsed_time="1277.792691">
+<scores>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">102</value>
+<value letter_id="G">2</value>
+<value letter_id="T">-2</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">98</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">98</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-2</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">156</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">98</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">102</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">197</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">156</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">2</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-2</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">156</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">202</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">98</value>
+<value letter_id="C">102</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">156</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">2</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">202</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">202</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">197</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">98</value>
+<value letter_id="C">102</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">197</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-2</value>
+<value letter_id="C">161</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-2</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">-865</value>
+<value letter_id="T">156</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">202</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">102</value>
+<value letter_id="G">102</value>
+<value letter_id="T">-865</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-865</value>
+<value letter_id="C">-865</value>
+<value letter_id="G">2</value>
+<value letter_id="T">156</value>
+</alphabet_array>
+</alphabet_matrix>
+</scores>
+<probabilities>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.500000</value>
+<value letter_id="G">0.250000</value>
+<value letter_id="T">0.250000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.500000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.500000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.250000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.750000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.500000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.500000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">1.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.750000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.250000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.250000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.750000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">1.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.500000</value>
+<value letter_id="C">0.500000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.750000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.250000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">1.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">1.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">1.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.500000</value>
+<value letter_id="C">0.500000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">1.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.250000</value>
+<value letter_id="C">0.750000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.250000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.000000</value>
+<value letter_id="T">0.750000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">1.000000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.500000</value>
+<value letter_id="G">0.500000</value>
+<value letter_id="T">0.000000</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.000000</value>
+<value letter_id="C">0.000000</value>
+<value letter_id="G">0.250000</value>
+<value letter_id="T">0.750000</value>
+</alphabet_array>
+</alphabet_matrix>
+</probabilities>
+<regular_expression>
+G[CGT][AT][TA]G[AG]TG[AG][TA]GC[AC][AG]CCGA[AC]AG[CA]G[TA]G[CG][TG]
+</regular_expression>
+<contributing_sites>
+</contributing_sites>
+</motif>
+<motif id="motif_6" name="VKAGVTSRTMMGWSHSDDGADSTGBMGRR" alt="MEME-6" width="29" sites="1943" ic="11.5" re="11.6" llr="15563" p_value="1.4e-021" e_value="1.2e+006" bayes_threshold="13.9694" elapsed_time="1512.396489">
+<scores>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">31</value>
+<value letter_id="C">-7</value>
+<value letter_id="G">67</value>
+<value letter_id="T">-205</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-173</value>
+<value letter_id="C">-192</value>
+<value letter_id="G">91</value>
+<value letter_id="T">64</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">126</value>
+<value letter_id="C">-138</value>
+<value letter_id="G">-63</value>
+<value letter_id="T">-90</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-134</value>
+<value letter_id="C">-160</value>
+<value letter_id="G">152</value>
+<value letter_id="T">-119</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">13</value>
+<value letter_id="C">-3</value>
+<value letter_id="G">78</value>
+<value letter_id="T">-210</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-128</value>
+<value letter_id="C">-139</value>
+<value letter_id="G">-68</value>
+<value letter_id="T">135</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-155</value>
+<value letter_id="C">32</value>
+<value letter_id="G">110</value>
+<value letter_id="T">-173</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">40</value>
+<value letter_id="C">-208</value>
+<value letter_id="G">109</value>
+<value letter_id="T">-156</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-118</value>
+<value letter_id="C">-133</value>
+<value letter_id="G">-73</value>
+<value letter_id="T">134</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">81</value>
+<value letter_id="C">48</value>
+<value letter_id="G">-105</value>
+<value letter_id="T">-143</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">87</value>
+<value letter_id="C">33</value>
+<value letter_id="G">-95</value>
+<value letter_id="T">-138</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-134</value>
+<value letter_id="C">-170</value>
+<value letter_id="G">155</value>
+<value letter_id="T">-132</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">45</value>
+<value letter_id="C">-204</value>
+<value letter_id="G">-109</value>
+<value letter_id="T">91</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-180</value>
+<value letter_id="C">26</value>
+<value letter_id="G">118</value>
+<value letter_id="T">-173</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">24</value>
+<value letter_id="C">16</value>
+<value letter_id="G">-120</value>
+<value letter_id="T">33</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-155</value>
+<value letter_id="C">30</value>
+<value letter_id="G">107</value>
+<value letter_id="T">-145</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-6</value>
+<value letter_id="C">-56</value>
+<value letter_id="G">48</value>
+<value letter_id="T">-4</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">13</value>
+<value letter_id="C">-236</value>
+<value letter_id="G">50</value>
+<value letter_id="T">36</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-135</value>
+<value letter_id="C">-169</value>
+<value letter_id="G">155</value>
+<value letter_id="T">-125</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">127</value>
+<value letter_id="C">-128</value>
+<value letter_id="G">-62</value>
+<value letter_id="T">-99</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">11</value>
+<value letter_id="C">-221</value>
+<value letter_id="G">58</value>
+<value letter_id="T">26</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-155</value>
+<value letter_id="C">39</value>
+<value letter_id="G">106</value>
+<value letter_id="T">-168</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-121</value>
+<value letter_id="C">-161</value>
+<value letter_id="G">-70</value>
+<value letter_id="T">137</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-138</value>
+<value letter_id="C">-154</value>
+<value letter_id="G">155</value>
+<value letter_id="T">-135</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-172</value>
+<value letter_id="C">-10</value>
+<value letter_id="G">71</value>
+<value letter_id="T">19</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">66</value>
+<value letter_id="C">62</value>
+<value letter_id="G">-102</value>
+<value letter_id="T">-133</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">-136</value>
+<value letter_id="C">-162</value>
+<value letter_id="G">154</value>
+<value letter_id="T">-123</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">44</value>
+<value letter_id="C">-208</value>
+<value letter_id="G">107</value>
+<value letter_id="T">-165</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">70</value>
+<value letter_id="C">-188</value>
+<value letter_id="G">85</value>
+<value letter_id="T">-172</value>
+</alphabet_array>
+</alphabet_matrix>
+</scores>
+<probabilities>
+<alphabet_matrix>
+<alphabet_array>
+<value letter_id="A">0.314462</value>
+<value letter_id="C">0.233659</value>
+<value letter_id="G">0.390633</value>
+<value letter_id="T">0.061245</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.076686</value>
+<value letter_id="C">0.064848</value>
+<value letter_id="G">0.463716</value>
+<value letter_id="T">0.394750</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.609882</value>
+<value letter_id="C">0.094699</value>
+<value letter_id="G">0.159032</value>
+<value letter_id="T">0.136387</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.100360</value>
+<value letter_id="C">0.081318</value>
+<value letter_id="G">0.707154</value>
+<value letter_id="T">0.111168</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.278435</value>
+<value letter_id="C">0.241379</value>
+<value letter_id="G">0.420998</value>
+<value letter_id="T">0.059187</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.104478</value>
+<value letter_id="C">0.093670</value>
+<value letter_id="G">0.153371</value>
+<value letter_id="T">0.648482</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.086979</value>
+<value letter_id="C">0.307257</value>
+<value letter_id="G">0.529079</value>
+<value letter_id="T">0.076686</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.334020</value>
+<value letter_id="C">0.058157</value>
+<value letter_id="G">0.521873</value>
+<value letter_id="T">0.085950</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.112198</value>
+<value letter_id="C">0.097787</value>
+<value letter_id="G">0.148224</value>
+<value letter_id="T">0.641791</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.444673</value>
+<value letter_id="C">0.342254</value>
+<value letter_id="G">0.118888</value>
+<value letter_id="T">0.094184</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.465775</value>
+<value letter_id="C">0.309315</value>
+<value letter_id="G">0.127123</value>
+<value letter_id="T">0.097787</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.100360</value>
+<value letter_id="C">0.075656</value>
+<value letter_id="G">0.722594</value>
+<value letter_id="T">0.101390</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.347401</value>
+<value letter_id="C">0.059701</value>
+<value letter_id="G">0.115800</value>
+<value letter_id="T">0.477097</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.073083</value>
+<value letter_id="C">0.294390</value>
+<value letter_id="G">0.555841</value>
+<value letter_id="T">0.076686</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.299022</value>
+<value letter_id="C">0.274833</value>
+<value letter_id="G">0.107051</value>
+<value letter_id="T">0.319094</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.086979</value>
+<value letter_id="C">0.303654</value>
+<value letter_id="G">0.516212</value>
+<value letter_id="T">0.093155</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.243438</value>
+<value letter_id="C">0.166752</value>
+<value letter_id="G">0.342254</value>
+<value letter_id="T">0.247555</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.278435</value>
+<value letter_id="C">0.047864</value>
+<value letter_id="G">0.347401</value>
+<value letter_id="T">0.326300</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.099331</value>
+<value letter_id="C">0.076171</value>
+<value letter_id="G">0.717962</value>
+<value letter_id="T">0.106536</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.610911</value>
+<value letter_id="C">0.101390</value>
+<value letter_id="G">0.160062</value>
+<value letter_id="T">0.127638</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.274318</value>
+<value letter_id="C">0.053011</value>
+<value letter_id="G">0.368502</value>
+<value letter_id="T">0.304169</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.086979</value>
+<value letter_id="C">0.321668</value>
+<value letter_id="G">0.512095</value>
+<value letter_id="T">0.079259</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.110139</value>
+<value letter_id="C">0.080803</value>
+<value letter_id="G">0.151827</value>
+<value letter_id="T">0.657231</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.097272</value>
+<value letter_id="C">0.084406</value>
+<value letter_id="G">0.718477</value>
+<value letter_id="T">0.099846</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.077200</value>
+<value letter_id="C">0.230057</value>
+<value letter_id="G">0.403500</value>
+<value letter_id="T">0.289243</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.400412</value>
+<value letter_id="C">0.377252</value>
+<value letter_id="G">0.121462</value>
+<value letter_id="T">0.100875</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.098816</value>
+<value letter_id="C">0.079774</value>
+<value letter_id="G">0.713330</value>
+<value letter_id="T">0.108080</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.345342</value>
+<value letter_id="C">0.058157</value>
+<value letter_id="G">0.515697</value>
+<value letter_id="T">0.080803</value>
+</alphabet_array>
+<alphabet_array>
+<value letter_id="A">0.411220</value>
+<value letter_id="C">0.066907</value>
+<value letter_id="G">0.444673</value>
+<value letter_id="T">0.077200</value>
+</alphabet_array>
+</alphabet_matrix>
+</probabilities>
+<regular_expression>
+[GAC][GT]AG[GAC]T[GC][GA]T[AC][AC]G[TA][GC][TAC][GC][GTA][GTA]GA[GTA][GC]TG[GTC][AC]G[GA][GA]
+</regular_expression>
+<contributing_sites>
+</contributing_sites>
+</motif>
+</motifs>
+</MEME>
