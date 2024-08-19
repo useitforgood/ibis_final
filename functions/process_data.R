@@ -12,6 +12,7 @@ process_meme_exp <- function(data, tfs, exp, base_command = "docker exec memesui
     print(dir_)
     print(glue::glue("{dir_}.fasta"))
     if (file.exists(glue::glue("{dir_}/meme.xml")) & file.size(glue::glue("{dir_}/meme.xml")) != 0) next
+    if (file.exists(glue::glue("{dir_}/meme.txt")) != 0) next
     if (!dir.exists(dir_)) {
       dir.create(dir_, recursive = TRUE)
     }
@@ -147,4 +148,38 @@ process_row.genome <- function(row, data, pt = "lb") {
     param = row,
     time = Sys.time() - t
   )
+}
+
+process_ame <- function(row, dir_, base_command = "/home/ubuntu/bin/ame", suff = "_cut", type = "fin") {
+  tf <- row$tf[1]
+  num <- row$bucket[1]
+  pos <- glue::glue("{dir_}{tf}{suff}_positive_{type}.fasta")
+  if (!file.exists(pos)) pos <- glue::glue("{dir_}{tf}{suff}_ext_positive_{type}.fasta")
+  neg <- glue::glue("{dir_}{tf}{suff}_negative_{type}.fasta")
+  if (!file.exists(neg)) neg <- glue::glue("{dir_}{tf}{suff}_ext_negative_{type}.fasta")
+  pwms <- glue::glue("{row$params}/{tf}/filtered_meme.xml")
+  existing_pwm_paths <- pwms[file.exists(pwms)]
+  if (length(existing_pwm_paths) > 0) {
+    if (file.exists( glue::glue("data/ame{suff}_{type}/{tf}_{num}.RDS"))) {
+      print("exists")
+      return("exists")
+    }
+    pwms <- paste(existing_pwm_paths, collapse = " ")
+    command <- paste(base_command, "--oc", glue::glue("{getwd()}/ame{suff}_{type}/"), " --noseq --control ", neg, pos, pwms)
+    system(command)
+    ame <- read_delim(glue::glue("{getwd()}/ame{suff}_{type}/ame.tsv"), delim = "\t", escape_double = FALSE, trim_ws = TRUE, col_names = FALSE)
+    ame %<>% filter(X1 != "rank", !is.na(X10))
+    ame %<>% mutate_at(c("X15", "X17"), as.numeric)
+    if (!dir.exists(glue::glue("data/ame{suff}_{type}"))) dir.create(glue::glue("data/ame{suff}_{type}"), recursive = TRUE)
+    saveRDS(distinct(ame, X11, X12), glue::glue("data/ame{suff}_{type}/counts_{tf}_{num}.RDS"))
+    ame$X17 <- 100 - ame$X17
+    ame$score <- (ame$X15 + ame$X17)/2
+    ame %<>% select(X2, X3, X4, X15, X17, score)
+    # ame %<>% arrange(desc(score)) %>% distinct(X2, .keep_all = TRUE)
+    # ame %<>% head(10)
+    saveRDS(ame, glue::glue("data/ame{suff}_{type}/{tf}_{num}.RDS"))
+    return("success")
+  } else {
+    return("failure")
+  }
 }

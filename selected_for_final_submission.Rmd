@@ -1,0 +1,390 @@
+---
+title: "No models, just interpretable rules"
+author: "callitmagic"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+    code_folding: show
+    code_download: true
+---
+
+### Software used
+
+[The MEME Suite](https://meme-suite.org/meme/)
+
+```{bash}
+/home/ubuntu/bin/meme -version
+```
+
+### Setup
+
+```{r setup, message = FALSE, error = FALSE}
+knitr::opts_chunk$set(message = FALSE, error = FALSE)
+sapply(list.files("functions/", full.names = TRUE), source)
+```
+
+#### Session info and constants
+
+```{r}
+require("Biostrings")
+require("magrittr")
+require("dplyr")
+require("readr")
+require("purrr")
+require("parallel")
+require("glue")
+require("XML")
+set.seed(53)
+GENOME_PATH <- "data/genome/"
+TRAIN_PATH <- "data/train_unified/"
+DATA_PATHS <- list(
+  "lb" = list(
+    train = "data/raw_data/IBIS.train_data.Leaderboard.v2/",
+    test = "data/raw_data/IBIS.test_data.Leaderboard.v2/",
+    is_genome = c("GABPA", "PRDM5", "SP140", "ZNF362", "ZNF407"),
+    is_artificial = c("LEF1", "NACC2", "RORB", "TIGD3", "NFKB1")
+  ),
+  "fin" = list(
+    train = "data/raw_data/IBIS.train_data.Final.v1/train/",
+    test = "data/raw_data/IBIS.test_data.Final.v1/",
+    is_genome = c("CAMTA1", "LEUTX", "MYF6", "PRDM13", "SALL3", "USF3", "ZBED2", "ZBED5", "ZNF20", "ZNF251", "ZNF367", "ZNF395", "ZNF493", "ZNF518B", "ZNF648"),
+    is_artificial = c("GCM1", "MKX", "MSANTD1", "MYPOP", "SP140L", "TPRX1", "ZFTA", "CREB3L3", "FIZ1", "ZBTB47", "ZNF286B", "ZNF500", "ZNF721", "ZNF780B", "ZNF831")
+  )
+)
+DATA_TYPES <- names(DATA_PATHS)
+sessionInfo()
+```
+
+#### Genome
+
+```{bash, class.source="bg-warning", eval=FALSE}
+cd data/genome/
+for i in {1..22}; do file="chr${i}.fa.gz"; [ ! -f "$file" ] && wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/$file; done
+cd ../../
+```
+
+#### Data download
+
+```{bash, class.source="bg-warning", eval=FALSE}
+cd data/raw_data/
+wget https://ibis.autosome.org/IBIS_data/IBIS.test_data.Leaderboard.v3.zip
+wget https://ibis.autosome.org/IBIS_data/IBIS.train_data.Leaderboard.v2.zip
+wget https://ibis.autosome.org/IBIS_data/IBIS.train_data.Final.v1.zip
+wget https://ibis.autosome.org/IBIS_data/IBIS.test_data.Final.v1.zip
+
+for f in *.zip; do dir="${f%.zip}"; mkdir "$dir" && unzip "$f" -d "$dir" && rm "$f"; done
+cd ../../
+```
+
+#### Data conversion
+
+```{r}
+rewrite <- FALSE
+data <- tibble()
+for (pt in DATA_TYPES) {
+  path <- glue::glue("{TRAIN_PATH}CHS_GHTS_{pt}.RDS")
+  if (file.exists(path) & !rewrite) {
+    print(paste(path, "exists"))
+    next
+  }
+  saveRDS(rbind(
+    merge_peak_files(glue::glue("{DATA_PATHS[[pt]]$train}/CHS"), GENOME_PATH),
+    merge_peak_files(glue::glue("{DATA_PATHS[[pt]]$train}/GHTS"), GENOME_PATH)
+  ), path)
+}
+
+for (pt in DATA_TYPES) {
+  path <- glue::glue("{TRAIN_PATH}PBM_{pt}.RDS")
+  if (file.exists(path) & !rewrite) {
+    print(paste(path, "exists"))
+    next
+  }
+  saveRDS(merge_peak_files(glue::glue("{DATA_PATHS[[pt]]$train}/PBM"), GENOME_PATH), path)
+}
+
+for (pt in DATA_TYPES) {
+  path <- glue::glue("data/train_unified/HTS_{pt}.RDS")
+  if (file.exists(path) & !rewrite) {
+    print(paste(path, "exists"))
+    next
+  }
+  data <- merge_seqs(glue::glue("{DATA_PATHS[[pt]]$train}/HTS"))
+  rownames(data) <- NULL
+  saveRDS(data, glue::glue("data/train_unified/HTS_{pt}.RDS"))
+}
+
+for (pt in DATA_TYPES) {
+  path <- glue::glue("data/train_unified/SMS_{pt}.RDS")
+  if (file.exists(path) & !rewrite) {
+    print(paste(path, "exists"))
+    next
+  }
+  data <- merge_seqs(glue::glue("{DATA_PATHS[[pt]]$train}/SMS"))
+  rownames(data) <- NULL
+  saveRDS(data, path)
+}
+rm(data)
+gc()
+```
+
+## PWM track
+
+### Generating motifs - parameters grids
+
+```{r}
+param_grid <- expand.grid(
+  length = c(5, 10, 15, 30, NA),
+  GHTS = c(TRUE, FALSE),
+  CHS = c(TRUE, FALSE),
+  meme_rev = c(TRUE, FALSE),
+  pileup = c(25, 50, 75, 90, NA),
+  maxw = c(15, 30),
+  seed = 53
+)
+param_grid %<>% filter(GHTS | CHS)
+param_grid %<>% filter(length*2 >= maxw | is.na(length))
+additional_grid <- expand.grid(
+  length = c(5),
+  GHTS = c(TRUE, FALSE),
+  CHS = c(TRUE, FALSE),
+  meme_rev = c(FALSE),
+  pileup = c(25, NA),
+  maxw = c(30),
+  seed = 53
+)
+additional_grid %<>% filter(GHTS | CHS)
+param_grid %<>% rbind(additional_grid) 
+param_grid$n <- 1:nrow(param_grid)
+saveRDS(param_grid, "data/params/genome_param_grid.RDS")
+param_grid <- expand.grid(
+  SMS = c(TRUE, FALSE),
+  PBM = c(TRUE, FALSE),
+  HTS = c(TRUE, FALSE),
+  PBM_filter = c("max", "2sd", NA),
+  PBM_subset = c("QNZS", "SD", NA),
+  HTS_subset = c("C4", "C3", NA),
+  meme_rev = c(TRUE, FALSE),
+  seed = 53,
+  stringsAsFactors = FALSE
+)
+param_grid %<>% filter(SMS | PBM | HTS)
+param_grid %<>% filter(!(SMS & PBM & HTS & !is.na(PBM_subset)))
+param_grid %<>% filter(!(SMS & PBM & HTS & !is.na(PBM_filter)))
+param_grid %<>% filter((!PBM & (is.na(PBM_filter) & is.na(PBM_subset))) | (PBM & !is.na(PBM_filter)))
+param_grid %<>% filter((!HTS & is.na(HTS_subset)) | HTS)
+param_grid %<>% rbind(expand.grid(
+  SMS = c(FALSE),
+  PBM = c(TRUE),
+  HTS = c(FALSE),
+  PBM_filter = c("max", "2sd", NA),
+  PBM_subset = c("QNZS", "SD", NA),
+  HTS_subset = c(NA),
+  meme_rev = c(TRUE, FALSE),
+  seed = 53,
+  stringsAsFactors = FALSE
+))
+
+additional_grid <- expand.grid(
+  SMS = c(FALSE),
+  PBM = c(TRUE),
+  HTS = c(TRUE, FALSE),
+  PBM_filter = c("5", "10"),
+  PBM_subset = c(NA),
+  HTS_subset = c("C3", NA),
+  meme_rev = c(TRUE),
+  seed = 53,
+  stringsAsFactors = FALSE
+)
+param_grid %<>% rbind(additional_grid)
+param_grid$n <- 1:nrow(param_grid)
+param_grid %<>% filter(!SMS)
+saveRDS(param_grid, "data/params/artificial_param_grid.RDS")
+```
+
+### Generating motifs - genome data
+
+```{r, results = "hide", eval = FALSE}
+param_grid <- readRDS("data/params/genome_param_grid.RDS")
+row_list <- split(param_grid, seq(nrow(param_grid)))
+for (type in DATA_TYPES) {
+  data_ <- get_train(exp = "CHS_GHTS", pt = type)
+  results <- lapply(row_list, function(row) process_row.genome(row, data_, pt = type))
+  saveRDS(results, glue::glue("timings/{type}_genome_param_grid.RDS"))
+  files <- list.files(glue::glue("meme_comparison/data/tmp_memedir_{type}"), recursive = TRUE, full.names = TRUE)
+  file.remove(files[!grepl("meme\\.xml|meme\\.txt$", files)])
+}
+```
+
+### Generating motifs - artificial data
+
+```{r, results = "hide", eval = FALSE}
+param_grid <- readRDS("data/params/artificial_param_grid.RDS")
+row_list <- split(param_grid, seq(nrow(param_grid)))
+for (type in DATA_TYPES) {
+  data_ <- list(SMS = get_train(exp = "SMS", pt = type), PBM = get_train(exp = "PBM", pt = type), HTS = get_train(exp = "HTS", pt = type))
+  results <- lapply(row_list, function(row) process_row.artificial(row, data_, pt = type))
+  saveRDS(results, glue::glue("timings/{type}_artificial_param_grid.RDS"))
+  files <- list.files(glue::glue("meme_comparison/data/tmp_memedir_{type}"), recursive = TRUE, full.names = TRUE)
+  file.remove(files[!grepl("meme\\.xml|meme\\.txt$", files)])
+}
+```
+
+### Cleaning motifs
+
+```{r}
+evalue_threshold <- 0.05
+filter_meme_file <- function(file_path, evalue_threshold) {
+  xml_doc <- xmlParse(file_path)
+  motifs <- getNodeSet(xml_doc, "//motif")
+  for (motif in motifs) {
+    evalue <- as.numeric(xmlGetAttr(motif, "e_value"))
+    if (evalue > evalue_threshold) {
+      removeNodes(motif)
+    }
+  }
+  if (length(getNodeSet(xml_doc, "//motif")) > 0) {
+    saveXML(xml_doc, file = sub("meme.xml$", "filtered_meme.xml", file_path))
+  }
+  file.remove(file_path)
+}
+for (type in DATA_TYPES) {
+  meme_files <-
+    list.files(
+      path = glue::glue("meme_comparison/data/tmp_memedir_{type}/"),
+      pattern = "^meme.xml$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+  if (length(meme_files) > 0) {
+    res <- lapply(meme_files, filter_meme_file, evalue_threshold = evalue_threshold)
+  }
+  cat(glue::glue("Filtered {type} meme.xml files based on the e-value threshold."), "\n")
+}
+```
+
+### AME comparison
+
+#### Control sequences
+
+```{r, eval = FALSE}
+dir_ <- "meme_comparison/references/"
+ind <- 20
+
+for (type in DATA_TYPES) {
+  references <- rbind(
+    get_train(exp = "CHS_GHTS", pt = type) %>% select(tf, seq, method),
+    get_train(exp = "PBM", pt = type) %>%
+      mutate(method = gsub("_.*", "", f_name)) %>%
+      group_by(method) %>%
+      mutate(
+        mean_sig = mean(mean_signal_intensity),
+        sd_sig = sd(mean_signal_intensity),
+        th = mean_sig + 2 * sd_sig
+      ) %>%
+      ungroup %>%
+      filter(mean_signal_intensity > th) %>%
+      select(tf, seq = pbm_sequence) %>% mutate(method = "PBM"),
+    get_train(exp = "HTS", pt = type) %>%
+      filter(grepl("R0_C4", f_name) | grepl("R1_C4", f_name)) %>%
+      select(tf, seq) %>%
+      mutate(method = "HTS") %>% group_by(tf) %>% sample_frac(0.5) %>% ungroup
+  )
+  references %<>% filter(!grepl("N", seq))
+  references$n <- 1:nrow(references)
+  saveRDS(references, glue::glue("{dir_}full_{type}.RDS"))
+  for (tf_ in unique(references$tf)) {
+    pos <- glue::glue("{dir_}/{tf_}_positive_{type}.fasta")
+    writeLines(paste0(
+      paste0(">", references$n[references$tf == tf_], "\n"), references$seq[references$tf == tf_], 
+      collapse = "\n"), 
+      pos)
+    neg <- glue::glue("{dir_}/{tf_}_negative_{type}.fasta")
+    writeLines(paste0(
+      paste0(">", references$n[references$tf != tf_], "\n"), references$seq[references$tf != tf_], 
+      collapse = "\n"), 
+      neg)
+  }
+  references <- references %>% mutate(seq = substr(seq, nchar(seq)/2 - ind, nchar(seq)/2 + ind))
+  is_genome <- DATA_PATHS[[type]]$is_genome
+  references$is_genome <- references$tf %in% is_genome
+  for (tf_ in unique(references$tf)) {
+    pos <- glue::glue("{dir_}/{tf_}_sep_cut_positive_{type}.fasta")
+    writeLines(paste0(
+      paste0(">", references$n[references$tf == tf_], "\n"), references$seq[references$tf == tf_], 
+      collapse = "\n"), 
+      pos)
+    neg <- glue::glue("{dir_}/{tf_}_sep_cut_negative_{type}.fasta")
+    writeLines(paste0(
+      paste0(">", references$n[references$tf != tf_ & (references$is_genome == tf_ %in% is_genome)], "\n"), 
+      references$seq[references$tf != tf_ & (references$is_genome == tf_ %in% is_genome)], 
+      collapse = "\n"), 
+      neg)
+  }
+  references <- rbind(
+    get_train(exp = "CHS_GHTS", pt = type) %>% select(tf, seq, method),
+    get_train(exp = "PBM", pt = type) %>%
+      mutate(method = gsub("_.*", "", f_name)) %>%
+      group_by(method) %>%
+      mutate(mean_sig = mean(mean_signal_intensity), sd_sig = sd(mean_signal_intensity), th = mean_sig + 2*sd_sig) %>%
+      ungroup %>%
+      filter(mean_signal_intensity > th) %>%
+      select(tf, seq = pbm_sequence) %>% mutate(method = "PBM"),
+    get_train(exp = "HTS", pt = type) %>%
+      filter(grepl("R0_C4", f_name) | grepl("R0_C3", f_name) | grepl("R1_C4", f_name) | grepl("R1_C3", f_name)) %>%
+      select(tf, seq) %>%
+      mutate(method = "HTS") %>% group_by(tf) %>% sample_frac(0.5) %>% ungroup
+  )
+  ind <- 20
+  references %<>% filter(!grepl("N", seq))
+  references$n <- 1:nrow(references)
+  saveRDS(references, glue::glue("{dir_}full_ext_{type}.RDS"))
+  references <- references %>% mutate(seq = substr(seq, nchar(seq)/2 - ind, nchar(seq)/2 + ind))
+  references$is_genome <- references$tf %in% is_genome
+  for (tf_ in unique(references$tf)) {
+    pos <- glue::glue("{dir_}/{tf_}_sep_cut_ext_positive_{type}.fasta")
+    writeLines(paste0(
+      paste0(">", references$n[references$tf == tf_], "\n"), references$seq[references$tf == tf_], 
+      collapse = "\n"), 
+      pos)
+    neg <- glue::glue("{dir_}/{tf_}_sep_cut_ext_negative_{type}.fasta")
+    writeLines(paste0(
+      paste0(">", references$n[references$tf != tf_ & (references$is_genome == tf_ %in% is_genome)], "\n"), 
+      references$seq[references$tf != tf_ & (references$is_genome == tf_ %in% is_genome)], 
+      collapse = "\n"), 
+      neg)
+  }
+}
+```
+
+#### AME processing
+
+```{r}
+names_g <- readRDS("data/params/genome_param_grid.RDS")
+names_g <- unlist(lapply(split(names_g, seq(nrow(names_g))), function(row) paste(row, collapse = "_")))
+names_a <- readRDS("data/params/artificial_param_grid.RDS")
+names_a <- unlist(lapply(split(names_a, seq(nrow(names_a))), function(row) paste(row, collapse = "_")))
+  
+for (type in DATA_TYPES) {
+  comparison_grid <- rbind(
+    expand.grid(tf = DATA_PATHS[[type]]$is_genome, 
+                params = names_g, 
+                stringsAsFactors = FALSE),
+    expand.grid(tf = DATA_PATHS[[type]]$is_artificial, 
+                params = names_a, 
+                stringsAsFactors = FALSE)
+  )
+  comparison_grid$params <- file.path(glue::glue("meme_comparison/data/tmp_memedir_{type}/"), comparison_grid$params)
+  for (tf_ in unique(comparison_grid$tf)) {
+    print(tf_)
+    suff_ <- "_sep_cut"
+    if (tf_ %in% is_genome) suff_ <- ""
+    print(suff_)
+  }
+}
+```
+
+## AAA track
