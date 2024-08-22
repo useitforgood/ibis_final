@@ -167,9 +167,9 @@ process_ame <- function(row, dir_, base_command = "/home/ubuntu/bin/ame", suff =
       return("exists")
     }
     pwms <- paste(existing_pwm_paths, collapse = " ")
-    command <- paste(base_command, "--oc", glue::glue("{getwd()}/ame{suff}_{type}_{tf}/"), " --noseq --control ", neg, pos, pwms)
+    command <- paste(base_command, "--oc", glue::glue("{getwd()}/tmp/ame{suff}_{type}_{tf}/"), " --noseq --control ", neg, pos, pwms)
     system(command)
-    ame <- read_delim(glue::glue("{getwd()}/ame{suff}_{type}_{tf}/ame.tsv"), delim = "\t", escape_double = FALSE, trim_ws = TRUE, col_names = FALSE)
+    ame <- read_delim(glue::glue("{getwd()}/tmp/ame{suff}_{type}_{tf}/ame.tsv"), delim = "\t", escape_double = FALSE, trim_ws = TRUE, col_names = FALSE)
     ame %<>% filter(X1 != "rank", !is.na(X10))
     ame %<>% mutate_at(c("X15", "X17"), as.numeric)
     saveRDS(distinct(ame, X11, X12), glue::glue("meme_comparison/data/ame{suff}_{type}/counts_{tf}_{num}.RDS"))

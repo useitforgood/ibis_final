@@ -413,6 +413,42 @@ for (type in DATA_TYPES) {
 
 #### Getting best PWMs
 
-
+```{r}
+for (type in DATA_TYPES) {
+  is_genome <- DATA_PATHS[[type]]$is_genome
+  path <- glue::glue("meme_comparison/data/ame_{type}/")
+  data_ <- lapply(list.files(path, full.names = TRUE), readRDS)
+  data_ <- data_[sapply(data_, length) == 6]
+  if (length(data_) > 1) {
+    data_ %<>% Reduce(rbind, .)
+  }
+  data_$tf <- basename(dirname(data_$X2))
+  path <- glue::glue("meme_comparison/data/ame_sep_cut_{type}/")
+  data_cut <- lapply(list.files(path, full.names = TRUE), readRDS) # was ame_sep
+  data_cut <- data_cut[sapply(data_cut, length) == 6]
+  if (length(data_cut) > 1) {
+    data_cut %<>% Reduce(rbind, .)
+  }
+  data_cut$tf <- basename(dirname(data_cut$X2))
+  data <- rbind(data_ %>% filter(tf %in% is_genome), data_cut %>% filter(!(tf %in% is_genome)))
+  best_vars_ext <- data %>% group_by(tf) %>% arrange(desc(score)) %>% distinct(X3, .keep_all = TRUE) %>% 
+    slice_head(n = 8) %>% 
+    ungroup
+  saveRDS(best_vars_ext, glue::glue("meme_comparison/preds/best_vars_ext_selected_{type}8.RDS"))
+  
+  best_vars_ext <- data %>% group_by(tf) %>% arrange(desc(score)) %>% distinct(X3, .keep_all = TRUE) %>% 
+    slice_head(n = 12) %>% 
+    slice_tail(n = 4) %>% 
+    ungroup
+  saveRDS(best_vars_ext, glue::glue("meme_comparison/preds/best_vars_ext_selected_{type}12.RDS"))
+  
+  st <- data %>% group_by(tf) %>% 
+    arrange(desc(score)) %>% 
+    distinct(X3, .keep_all = TRUE) %>% 
+    slice_head(n = 4) %>% 
+    mutate(n = row_number()) %>% ungroup
+  collect_pwms_partial(st, glue::glue("meme_comparison/preds/{type}_PWM_{Sys.time()}_{type}.txt"))
+}
+```
 
 ## AAA track
