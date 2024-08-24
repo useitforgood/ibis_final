@@ -45,12 +45,14 @@ DATA_PATHS <- list(
   "lb" = list(
     train = "data/raw_data/IBIS.train_data.Leaderboard.v2/",
     test = "data/raw_data/IBIS.test_data.Leaderboard.v2/",
+    subm = "data/raw_data/Leaderboard_aaa_submissions.v3/",
     is_genome = c("GABPA", "PRDM5", "SP140", "ZNF362", "ZNF407"),
     is_artificial = c("LEF1", "NACC2", "RORB", "TIGD3", "NFKB1")
   ),
   "fin" = list(
     train = "data/raw_data/IBIS.train_data.Final.v1/train/",
     test = "data/raw_data/IBIS.test_data.Final.v1/",
+    subm = "data/raw_data/Final_aaa_submissions.v1/",
     is_genome = c("CAMTA1", "LEUTX", "MYF6", "PRDM13", "SALL3", "USF3", "ZBED2", "ZBED5", "ZNF20", "ZNF251", "ZNF367", "ZNF395", "ZNF493", "ZNF518B", "ZNF648"),
     is_artificial = c("GCM1", "MKX", "MSANTD1", "MYPOP", "SP140L", "TPRX1", "ZFTA", "CREB3L3", "FIZ1", "ZBTB47", "ZNF286B", "ZNF500", "ZNF721", "ZNF780B", "ZNF831")
   )
@@ -70,12 +72,14 @@ cd ../../
 
 #### Data download
 
-```{bash, class.source="bg-warning", eval=FALSE}
+```{bash, class.source="bg-warning", results = "hide", eval = FALSE}
 cd data/raw_data/
 wget https://ibis.autosome.org/IBIS_data/IBIS.test_data.Leaderboard.v3.zip
 wget https://ibis.autosome.org/IBIS_data/IBIS.train_data.Leaderboard.v2.zip
 wget https://ibis.autosome.org/IBIS_data/IBIS.train_data.Final.v1.zip
 wget https://ibis.autosome.org/IBIS_data/IBIS.test_data.Final.v1.zip
+wget https://ibis.autosome.org/IBIS_data/Leaderboard_aaa_submissions.v3.zip
+wget https://ibis.autosome.org/IBIS_data/Final_aaa_submissions.v1.zip
 
 for f in *.zip; do dir="${f%.zip}"; mkdir "$dir" && unzip "$f" -d "$dir" && rm "$f"; done
 cd ../../
@@ -452,3 +456,23 @@ for (type in DATA_TYPES) {
 ```
 
 ## AAA track
+
+#### Getting predictions from the best PWMs
+
+##### Getting tags and tfs from submission templates
+
+```{r, eval = FALSE}
+for (type in DATA_TYPES) {
+  experiments <- list.files(DATA_PATHS[[type]]$subm, pattern = "random", full.names = TRUE)
+  for (experiment in experiments) {
+    exp_ <- gsub("_aaa_random.tsv", "", gsub(paste0(DATA_PATHS[[type]]$subm, "/"), "", experiment))
+    exp <- read_delim(experiment) 
+    saveRDS(exp$tag, glue::glue("data/submissions/tags_{exp_}_{type}.RDS"))
+    saveRDS(colnames(exp)[-1], glue::glue("data/submissions/tfs_{exp_}_{type}.RDS"))
+    rm(exp)
+  }
+}
+```
+
+##### Predict with FIMO
+
