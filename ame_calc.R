@@ -12,13 +12,15 @@ TRAIN_PATH <- "data/train_unified/"
 DATA_PATHS <- list(
   "lb" = list(
     train = "data/raw_data/IBIS.train_data.Leaderboard.v2/",
-    test = "data/raw_data/IBIS.test_data.Leaderboard.v2/",
+    test = "data/raw_data/IBIS.test_data.Leaderboard.v3/",
+    subm = "data/raw_data/Leaderboard_aaa_submissions.v3/",
     is_genome = c("GABPA", "PRDM5", "SP140", "ZNF362", "ZNF407"),
     is_artificial = c("LEF1", "NACC2", "RORB", "TIGD3", "NFKB1")
   ),
   "fin" = list(
     train = "data/raw_data/IBIS.train_data.Final.v1/train/",
     test = "data/raw_data/IBIS.test_data.Final.v1/",
+    subm = "data/raw_data/Final_aaa_submissions.v1/",
     is_genome = c("CAMTA1", "LEUTX", "MYF6", "PRDM13", "SALL3", "USF3", "ZBED2", "ZBED5", "ZNF20", "ZNF251", "ZNF367", "ZNF395", "ZNF493", "ZNF518B", "ZNF648"),
     is_artificial = c("GCM1", "MKX", "MSANTD1", "MYPOP", "SP140L", "TPRX1", "ZFTA", "CREB3L3", "FIZ1", "ZBTB47", "ZNF286B", "ZNF500", "ZNF721", "ZNF780B", "ZNF831")
   )
