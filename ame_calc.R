@@ -39,10 +39,9 @@ ind <- if (is.na(as.numeric(args[1]))) args[1] else as.numeric(args[1])
 for (type in DATA_TYPES) {
   all_tfs <- c(DATA_PATHS[[type]]$is_genome, DATA_PATHS[[type]]$is_artificial)
   if (is.numeric(ind)) {
-    tfs <- all_tfs[(ind*5 + 1):(ind*5 + 5)]
-    tfs <- tfs[!is.na(tfs)]
+    tfs <- ind
   } else {
-    tfs <- all_tfs
+    tfs <- args[1]
   }
   if (length(tfs) == 0) next
   comparison_grid <- rbind(
