@@ -478,7 +478,7 @@ for (type in DATA_TYPES) {
 
 ```{r, results = "hide"}
 base_command <- "/home/ubuntu/bin/fimo"
-for (type in DATA_TYPES) {
+for (type in "lb") {
   best_vars <- readRDS(glue::glue("meme_comparison/preds/best_vars_ext_selected_{type}12.RDS"))
   experiments <- list.files(DATA_PATHS[[type]]$subm, pattern = "random", full.names = TRUE)
   exp_name <- glue::glue("final_{type}")
@@ -525,7 +525,7 @@ for (type in DATA_TYPES) {
 ##### Collect FIMO predictions
 
 ```{r, results = "hide"}
-for (type in DATA_TYPES) {
+for (type in "lb") {
   experiments <- list.files(DATA_PATHS[[type]]$subm, pattern = "random", full.names = TRUE)
   exp_name <- glue::glue("final_{type}_raw")
   best_vars <- readRDS(glue::glue("meme_comparison/preds/best_vars_ext_selected_{type}12.RDS"))
@@ -542,7 +542,6 @@ for (type in DATA_TYPES) {
       allowed_paths <- paste0(basename(dirname(dirname(best_vars_pt$X2))), "_", best_vars_pt$X4, "_", best_vars_pt$tf)
       p_files <- p_files[sapply(p_files, function(x) any(sapply(allowed_paths, grepl, x)))]
       f_name <- glue::glue('{fldr}/{exp_}_{tf_}_{exp_name}_preds.RDS')
-      if (file.exists(f_name)) next
       data <- lapply(p_files, function(x) {
         dt <- readRDS(x)
         dt$tf <- gsub(".RDS", "", gsub(".*_", "", x))
@@ -569,7 +568,6 @@ for (type in DATA_TYPES) {
     }
     fldr <- glue::glue("meme_comparison/preds/{type}/")
     f_name <- glue::glue("{fldr}/{exp_}_{exp_name}.RDS")
-    if (file.exists(f_name)) next
     files <- list.files(glue::glue("meme_comparison/data/partial_preds/{type}"), pattern = glue::glue("^{exp_}"), full.names = TRUE)
     files <- files[grepl(paste0(exp_name, "_preds.RDS"), files)]
     all <- Reduce(cbind, lapply(files, function(file) {dt <- readRDS(file); dt[, 2]}))
