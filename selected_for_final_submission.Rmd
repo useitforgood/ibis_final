@@ -435,10 +435,10 @@ for (type in DATA_TYPES) {
     data_cut %<>% Reduce(rbind, .)
   }
   data_cut$tf <- basename(dirname(data_cut$X2))
-  # filtering <- readRDS(glue::glue("data/params/artificial_param_grid.RDS"))
-  # filtering %<>% filter(!PBM_filter %in% c("5", "10"))
-  # allowed_paths <- unlist(lapply(split(filtering, seq(nrow(filtering))), function(row) paste(row, collapse = "_")))
-  # data_cut %<>% filter(sapply(X2, function(x) any(sapply(allowed_paths, function(path) grepl(pattern = path, x)))))
+  filtering <- readRDS(glue::glue("data/params/artificial_param_grid.RDS"))
+  filtering %<>% filter(!PBM_filter %in% c("5", "10"))
+  allowed_paths <- unlist(lapply(split(filtering, seq(nrow(filtering))), function(row) paste(row, collapse = "_")))
+  data_cut %<>% filter(sapply(X2, function(x) any(sapply(allowed_paths, function(path) grepl(pattern = path, x)))))
   data <- rbind(data_ %>% filter(tf %in% is_genome), data_cut %>% filter(!(tf %in% is_genome)))
   data %<>% group_by(tf) %>% mutate(score_ind = score >= quantile(score, 0.75)) %>% ungroup
   best_vars_ext <- data %>% group_by(tf) %>% arrange(desc(score)) %>% distinct(X3, .keep_all = TRUE) %>% 
@@ -478,7 +478,7 @@ for (type in DATA_TYPES) {
 
 ```{r, results = "hide"}
 base_command <- "/home/ubuntu/bin/fimo"
-for (type in "lb") {
+for (type in DATA_TYPES) {
   best_vars <- readRDS(glue::glue("meme_comparison/preds/best_vars_ext_selected_{type}12.RDS"))
   experiments <- list.files(DATA_PATHS[[type]]$subm, pattern = "random", full.names = TRUE)
   exp_name <- glue::glue("final_{type}")
@@ -525,7 +525,7 @@ for (type in "lb") {
 ##### Collect FIMO predictions
 
 ```{r, results = "hide"}
-for (type in "lb") {
+for (type in DATA_TYPES) {
   experiments <- list.files(DATA_PATHS[[type]]$subm, pattern = "random", full.names = TRUE)
   exp_name <- glue::glue("final_{type}_raw")
   best_vars <- readRDS(glue::glue("meme_comparison/preds/best_vars_ext_selected_{type}12.RDS"))

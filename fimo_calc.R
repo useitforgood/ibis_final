@@ -35,7 +35,7 @@ for (type in DATA_TYPES) {
   experiments <- list.files(DATA_PATHS[[type]]$subm, pattern = "random", full.names = TRUE)
   exp_name <- glue::glue("final_{type}")
   tryCatch({
-    for (experiment in experiments[5]) {
+    for (experiment in experiments[1]) {
       exp_ <- gsub("_aaa_random.tsv", "", gsub(paste0(DATA_PATHS[[type]]$subm, "/"), "", experiment))
       tfs_ <- readRDS(glue::glue("data/submissions/tfs_{exp_}_{type}.RDS"))
       for (tf_ in tfs_) {
